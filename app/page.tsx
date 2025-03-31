@@ -11,7 +11,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative h-[600px] md:h-[700px] overflow-hidden">
         <Image
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1.PNG-syKTtGxXGeRqnFHTlf9n6mGG0Ldb7F.png"
+          src="/images/offer_1.jpg"
           alt="Crown Hotel Luxury Room"
           fill
           className="object-cover"
@@ -32,7 +32,7 @@ export default function Home() {
               </Button>
             </Link>
             <Link href="/contact">
-              <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10">
+              <Button size="lg" variant="outline" className="text-red-600 border-white hover:bg-white/10">
                 Contact Us
               </Button>
             </Link>
@@ -71,7 +71,7 @@ export default function Home() {
             </div>
             <div className="relative">
               <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/6.PNG-yZ7zVkqLzXfNjIOEYBcFZW6C0FwaQw.png"
+                src="/images/discover_3.jpg"
                 alt="Crown Hotel Exterior"
                 width={600}
                 height={400}
@@ -96,7 +96,7 @@ export default function Home() {
             <Card className="overflow-hidden">
               <div className="relative h-64">
                 <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/5.PNG-iW2Fe3pqhjNVb3mj0q296sVczqQXDD.png"
+                  src="/images/discover_3.jpg"
                   alt="Luxury Single Room"
                   fill
                   className="object-cover"
@@ -142,7 +142,7 @@ export default function Home() {
             <Card className="overflow-hidden">
               <div className="relative h-64">
                 <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4.PNG-RIBwd59ACpqlHZMJZpGsZBEAIjlKGt.png"
+                  src="/images/discover_3.jpg"
                   alt="Luxury Double Suite"
                   fill
                   className="object-cover"
@@ -188,7 +188,7 @@ export default function Home() {
             <Card className="overflow-hidden">
               <div className="relative h-64">
                 <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/r1.PNG-630ZQVMvKNzrzAaDvbN6ZMnxU24uCh.png"
+                  src="/images/discover_3.jpg"
                   alt="Wing A Luxury Room"
                   fill
                   className="object-cover"
@@ -252,7 +252,7 @@ export default function Home() {
             <div className="text-center">
               <div className="relative h-64 mb-6 overflow-hidden rounded-lg">
                 <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/a2.PNG-bygezpnxOdOjhNCCXYP90zVubGE8It.png"
+                  src="/images/discover_3.jpg"
                   alt="Outdoor Pool"
                   fill
                   className="object-cover"
@@ -269,7 +269,7 @@ export default function Home() {
             <div className="text-center">
               <div className="relative h-64 mb-6 overflow-hidden rounded-lg">
                 <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/a2.PNG-bygezpnxOdOjhNCCXYP90zVubGE8It.png"
+                  src="/images/discover_3.jpg"
                   alt="Indoor Pool"
                   fill
                   className="object-cover"
@@ -286,7 +286,7 @@ export default function Home() {
             <div className="text-center">
               <div className="relative h-64 mb-6 overflow-hidden rounded-lg">
                 <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/a2.PNG-bygezpnxOdOjhNCCXYP90zVubGE8It.png"
+                  src="/images/discover_3.jpg"
                   alt="Spa Zone"
                   fill
                   className="object-cover"

@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/db"
 import { Role } from "@prisma/client"
-import { hash } from "bcrypt"
+import { hash } from "bcryptjs"
 import { revalidatePath } from "next/cache"
 
 export async function getUsers() {
