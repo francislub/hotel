@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "@/components/ui/use-toast"
 import { registerUser } from "@/lib/actions/auth-actions"
-import { updateStaffProfile } from "@/lib/actions/user-actions"
+import { updateStaffProfile, updateUser } from "@/lib/actions/user-actions"
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -63,8 +63,19 @@ export default function StaffForm({ initialData, isEditing = false }: StaffFormP
 
     try {
       if (isEditing && initialData?.id) {
-        // Update existing staff member
-        const result = await updateStaffProfile(initialData.id, {
+        // Update user data first
+        const userUpdateResult = await updateUser(initialData.id, {
+          name: values.name,
+          email: values.email,
+          role: values.role,
+        })
+
+        if (!userUpdateResult.success) {
+          throw new Error(userUpdateResult.message || "Failed to update user data")
+        }
+
+        // Then update staff profile
+        const staffUpdateResult = await updateStaffProfile(initialData.id, {
           position: values.position,
           department: values.department,
           salary: values.salary,
@@ -72,20 +83,16 @@ export default function StaffForm({ initialData, isEditing = false }: StaffFormP
           address: values.address,
         })
 
-        if (result.success) {
-          toast({
-            title: "Staff member updated",
-            description: "The staff member has been updated successfully.",
-          })
-          router.push("/dashboard/admin/staff")
-          router.refresh()
-        } else {
-          toast({
-            title: "Error",
-            description: result.message || "Failed to update staff member",
-            variant: "destructive",
-          })
+        if (!staffUpdateResult.success) {
+          throw new Error(staffUpdateResult.message || "Failed to update staff profile")
         }
+
+        toast({
+          title: "Staff member updated",
+          description: "The staff member has been updated successfully.",
+        })
+        router.push("/dashboard/admin/staff")
+        router.refresh()
       } else {
         // Create new staff member
         const result = await registerUser(
@@ -95,26 +102,25 @@ export default function StaffForm({ initialData, isEditing = false }: StaffFormP
           values.role,
         )
 
-        if (result.success) {
-          toast({
-            title: "Staff member created",
-            description: "The staff member has been created successfully.",
-          })
-          router.push("/dashboard/admin/staff")
-          router.refresh()
-        } else {
-          toast({
-            title: "Error",
-            description: result.message || "Failed to create staff member",
-            variant: "destructive",
-          })
+        if (!result.success) {
+          throw new Error(result.message || "Failed to create staff member")
         }
+
+        // If user was created successfully, update their staff profile
+        // Note: In a real app, registerUser would return the user ID
+        // For now, we'll assume it worked and redirect
+        toast({
+          title: "Staff member created",
+          description: "The staff member has been created successfully.",
+        })
+        router.push("/dashboard/admin/staff")
+        router.refresh()
       }
     } catch (error) {
       console.error("Error submitting form:", error)
       toast({
         title: "Error",
-        description: "An unexpected error occurred",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
         variant: "destructive",
       })
     } finally {

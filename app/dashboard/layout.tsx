@@ -3,8 +3,10 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { useSession } from "next-auth/react"
+import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -16,297 +18,207 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import {
-  Crown,
-  Menu,
-  X,
+  Bell,
+  Calendar,
+  CreditCard,
   Home,
   Hotel,
-  Users,
-  Calendar,
-  Settings,
-  CreditCard,
-  BarChart3,
   LogOut,
-  User,
-  Bell,
-  ChevronDown,
-  Utensils,
+  Menu,
   MessageSquare,
+  Settings,
+  User,
+  Users,
+  Activity,
   FileText,
-  HelpCircle,
-  ClipboardList,
+  DollarSign,
+  BarChart,
 } from "lucide-react"
-import { toast } from "@/components/ui/use-toast"
-import { useSession, signOut } from "next-auth/react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { ThemeToggle } from "@/components/theme-toggle"
 
-interface DashboardLayoutProps {
-  children: React.ReactNode
-}
-
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const router = useRouter()
   const { data: session, status } = useSession()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [userType, setUserType] = useState<string | null>(null)
-  const [userName, setUserName] = useState<string>("User")
 
   // Redirect if not authenticated
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/login")
+      redirect("/login")
     }
-  }, [status, router])
+  }, [status])
 
-  useEffect(() => {
-    if (session?.user) {
-      setUserType(session.user.role.toLowerCase())
-      setUserName(session.user.name || "User")
-    } else if (pathname) {
-      // Fallback to pathname-based detection
-      if (pathname.includes("/admin")) {
-        setUserType("admin")
-        setUserName("Admin User")
-      } else if (pathname.includes("/guest")) {
-        setUserType("guest")
-        setUserName("Guest User")
-      } else if (pathname.includes("/accountant")) {
-        setUserType("accountant")
-        setUserName("Accountant User")
-      } else if (pathname.includes("/staff")) {
-        setUserType("staff")
-        setUserName("Staff User")
-      }
-    }
-  }, [session, pathname])
-
-  const handleLogout = async () => {
-    await signOut({ redirect: false })
-    toast({
-      title: "Logged Out",
-      description: "You have been successfully logged out.",
-    })
-    router.push("/")
+  if (status === "loading") {
+    return <div className="flex h-screen items-center justify-center">Loading...</div>
   }
 
-  // Define navigation items based on user type
-  const getNavItems = () => {
-    switch (userType) {
-      case "admin":
+  if (!session) {
+    return null
+  }
+
+  const userRole = session.user.role
+
+  // Define navigation items based on user role
+  const navigationItems = (() => {
+    switch (userRole) {
+      case "ADMIN":
         return [
           { name: "Dashboard", href: "/dashboard/admin", icon: Home },
-          { name: "Rooms", href: "/dashboard/admin/rooms", icon: Hotel },
           { name: "Bookings", href: "/dashboard/admin/bookings", icon: Calendar },
-          { name: "Guests", href: "/dashboard/admin/guests", icon: Users },
+          { name: "Rooms", href: "/dashboard/admin/rooms", icon: Hotel },
+          { name: "Services", href: "/dashboard/admin/services", icon: CreditCard },
           { name: "Staff", href: "/dashboard/admin/staff", icon: Users },
-          { name: "Services", href: "/dashboard/admin/services", icon: Utensils },
-          { name: "Finance", href: "/dashboard/admin/finance", icon: CreditCard },
-          { name: "Reports", href: "/dashboard/admin/reports", icon: BarChart3 },
           { name: "Messages", href: "/dashboard/admin/messages", icon: MessageSquare },
+          { name: "Activities", href: "/dashboard/admin/activities", icon: Activity },
+          { name: "Reports", href: "/dashboard/admin/reports", icon: BarChart },
+          { name: "Finance", href: "/dashboard/admin/finance", icon: DollarSign },
           { name: "Settings", href: "/dashboard/admin/settings", icon: Settings },
         ]
-      case "guest":
+      case "GUEST":
         return [
           { name: "Dashboard", href: "/dashboard/guest", icon: Home },
-          { name: "My Bookings", href: "/dashboard/guest/bookings", icon: Calendar },
           { name: "Book a Room", href: "/dashboard/guest/book", icon: Hotel },
-          { name: "Services", href: "/dashboard/guest/services", icon: Utensils },
-          { name: "Dining", href: "/dashboard/guest/dining", icon: Utensils },
-          { name: "Spa & Wellness", href: "/dashboard/guest/spa", icon: Utensils },
-          { name: "Activities", href: "/dashboard/guest/activities", icon: Calendar },
-          { name: "Support", href: "/dashboard/guest/support", icon: HelpCircle },
+          { name: "My Bookings", href: "/dashboard/guest/bookings", icon: Calendar },
+          { name: "Activities", href: "/dashboard/guest/activities", icon: Activity },
+          { name: "Messages", href: "/dashboard/guest/messages", icon: MessageSquare },
           { name: "Profile", href: "/dashboard/guest/profile", icon: User },
+          { name: "Preferences", href: "/dashboard/guest/preferences", icon: Settings },
         ]
-      case "accountant":
+      case "ACCOUNTANT":
         return [
           { name: "Dashboard", href: "/dashboard/accountant", icon: Home },
           { name: "Transactions", href: "/dashboard/accountant/transactions", icon: CreditCard },
-          { name: "Invoices", href: "/dashboard/accountant/invoices", icon: FileText },
-          { name: "Reports", href: "/dashboard/accountant/reports", icon: BarChart3 },
-          { name: "Revenue", href: "/dashboard/accountant/revenue", icon: BarChart3 },
-          { name: "Expenses", href: "/dashboard/accountant/expenses", icon: CreditCard },
-          { name: "Payroll", href: "/dashboard/accountant/payroll", icon: Users },
-          { name: "Budgeting", href: "/dashboard/accountant/budgeting", icon: ClipboardList },
-          { name: "Settings", href: "/dashboard/accountant/settings", icon: Settings },
-        ]
-      case "staff":
-        return [
-          { name: "Dashboard", href: "/dashboard/staff", icon: Home },
-          { name: "Tasks", href: "/dashboard/staff/tasks", icon: ClipboardList },
-          { name: "Schedule", href: "/dashboard/staff/schedule", icon: Calendar },
-          { name: "Guests", href: "/dashboard/staff/guests", icon: Users },
-          { name: "Rooms", href: "/dashboard/staff/rooms", icon: Hotel },
-          { name: "Messages", href: "/dashboard/staff/messages", icon: MessageSquare },
-          { name: "Profile", href: "/dashboard/staff/profile", icon: User },
+          { name: "Reports", href: "/dashboard/accountant/reports", icon: FileText },
+          { name: "Expenses", href: "/dashboard/accountant/expenses", icon: DollarSign },
         ]
       default:
         return []
     }
-  }
-
-  const navItems = getNavItems()
-
-  if (status === "loading") {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-muted/30">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    )
-  }
+  })()
 
   return (
-    <div className="flex min-h-screen bg-muted/30">
-      {/* Sidebar for desktop */}
-      <aside className="hidden lg:flex lg:w-64 lg:flex-col">
-        <div className="flex flex-col flex-grow border-r bg-background">
-          <div className="flex items-center h-16 px-4 border-b">
-            <Link href="/" className="flex items-center gap-2">
-              <Crown className="h-6 w-6 text-primary" />
-              <span className="text-lg font-bold">CROWN HOTEL</span>
-            </Link>
-          </div>
-          <div className="flex-grow px-4 py-4 overflow-y-auto">
-            <nav className="space-y-1">
-              {navItems.map((item) => {
-                const isActive = pathname === item.href
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                      isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                    }`}
-                  >
-                    <item.icon
-                      className={`mr-3 h-5 w-5 ${isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground"}`}
-                    />
-                    {item.name}
-                  </Link>
-                )
-              })}
-            </nav>
-          </div>
-          <div className="p-4 border-t">
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-muted-foreground hover:text-foreground"
-              onClick={handleLogout}
-            >
-              <LogOut className="mr-3 h-5 w-5" />
-              Log out
-            </Button>
-          </div>
-        </div>
-      </aside>
-
-      {/* Mobile menu */}
-      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent side="left" className="w-64 p-0">
-          <div className="flex flex-col h-full">
-            <div className="flex items-center justify-between h-16 px-4 border-b">
-              <Link href="/" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-                <Crown className="h-6 w-6 text-primary" />
-                <span className="text-lg font-bold">CROWN HOTEL</span>
-              </Link>
-              <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
-            <div className="flex-grow px-4 py-4 overflow-y-auto">
-              <nav className="space-y-1">
-                {navItems.map((item) => {
-                  const isActive = pathname === item.href
-                  return (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                        isActive
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                      }`}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <item.icon
-                        className={`mr-3 h-5 w-5 ${isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground"}`}
-                      />
-                      {item.name}
-                    </Link>
-                  )
-                })}
-              </nav>
-            </div>
-            <div className="p-4 border-t">
-              <Button
-                variant="ghost"
-                className="w-full justify-start text-muted-foreground hover:text-foreground"
-                onClick={() => {
-                  handleLogout()
-                  setMobileMenuOpen(false)
-                }}
-              >
-                <LogOut className="mr-3 h-5 w-5" />
-                Log out
-              </Button>
-            </div>
-          </div>
-        </SheetContent>
-      </Sheet>
-
-      {/* Main content */}
-      <div className="flex flex-col flex-1">
-        {/* Top navigation */}
-        <header className="bg-background border-b sticky top-0 z-10">
-          <div className="flex items-center justify-between h-16 px-4">
-            <div className="flex items-center lg:hidden">
+    <div className="flex min-h-screen flex-col">
+      {/* Top Navigation Bar */}
+      <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center lg:hidden">
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(true)}>
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
-              <div className="ml-2 lg:hidden">
-                <span className="font-semibold capitalize">{userType} Dashboard</span>
-              </div>
-            </div>
-            <div className="flex-1 lg:ml-0 lg:justify-end flex items-center justify-end space-x-4">
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-primary"></span>
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2">
-                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                      <span className="text-primary font-bold">{userName.charAt(0)}</span>
-                    </div>
-                    <span className="hidden md:inline-block">{userName}</span>
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href={`/dashboard/${userType}/profile`}>Profile</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href={`/dashboard/${userType}/settings`}>Settings</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <SheetContent side="left" className="w-64">
+                <div className="flex flex-col space-y-6 py-4">
+                  <div className="px-4">
+                    <Link href="/" className="flex items-center gap-2 font-semibold">
+                      <Hotel className="h-6 w-6" />
+                      <span>Crown Hotel</span>
+                    </Link>
+                  </div>
+                  <nav className="flex flex-col space-y-1 px-2">
+                    {navigationItems.map((item) => (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
+                          pathname === item.href
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-muted hover:text-foreground"
+                        }`}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <item.icon className="h-4 w-4" />
+                        {item.name}
+                      </Link>
+                    ))}
+                  </nav>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+          <div className="hidden lg:flex">
+            <Link href="/" className="flex items-center gap-2 font-semibold">
+              <Hotel className="h-6 w-6" />
+              <span>Crown Hotel</span>
+            </Link>
+          </div>
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon">
+              <Bell className="h-5 w-5" />
+            </Button>
+            <ThemeToggle />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={session.user.image || ""} alt={session.user.name || "User"} />
+                    <AvatarFallback>{session.user.name?.charAt(0) || "U"}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{session.user.name}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{session.user.email}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href={`/dashboard/${userRole.toLowerCase()}/profile`}>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href={`/dashboard/${userRole.toLowerCase()}/settings`}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/api/auth/signout">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="flex flex-1">
+        {/* Sidebar - Desktop */}
+        <div className="hidden border-r bg-muted/40 lg:block lg:w-64">
+          <div className="flex h-full max-h-screen flex-col gap-2">
+            <div className="flex-1 overflow-auto py-2">
+              <nav className="grid items-start px-2 text-sm font-medium">
+                {navigationItems.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`flex items-center gap-3 rounded-md px-3 py-2 ${
+                      pathname === item.href
+                        ? "bg-primary text-primary-foreground"
+                        : "hover:bg-muted hover:text-foreground"
+                    }`}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {item.name}
+                  </Link>
+                ))}
+              </nav>
             </div>
           </div>
-        </header>
+        </div>
 
-        {/* Page content */}
-        <main className="flex-1 p-6 overflow-y-auto">{children}</main>
+        {/* Main Content */}
+        <main className="flex-1 overflow-auto p-4 md:p-6">{children}</main>
       </div>
     </div>
   )

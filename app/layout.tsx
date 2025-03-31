@@ -4,8 +4,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { SessionProvider } from "@/components/session-provider"
-import Header from "@/components/header"
-import Footer from "@/components/footer"
+import LayoutWrapper from "@/components/layout-wrapper"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -24,11 +23,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <SessionProvider>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-            <div className="flex min-h-screen flex-col">
-              <Header />
-              <main className="flex-1">{children}</main>
-              <Footer />
-            </div>
+            <LayoutWrapper>{children}</LayoutWrapper>
           </ThemeProvider>
         </SessionProvider>
       </body>
