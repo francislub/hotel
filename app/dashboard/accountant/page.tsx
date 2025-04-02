@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -20,111 +20,111 @@ import {
   Legend,
 } from "recharts"
 import { CreditCard, DollarSign, TrendingUp, ArrowUpRight, ArrowDownRight, FileText, Download, Eye } from "lucide-react"
-
-// Sample data for charts
-const revenueData = [
-  { name: "Jan", revenue: 4000, expenses: 2400 },
-  { name: "Feb", revenue: 3000, expenses: 1398 },
-  { name: "Mar", revenue: 5000, expenses: 3000 },
-  { name: "Apr", revenue: 4500, expenses: 2780 },
-  { name: "May", revenue: 6000, expenses: 3890 },
-  { name: "Jun", revenue: 5500, expenses: 3300 },
-  { name: "Jul", revenue: 7000, expenses: 4300 },
-]
-
-const expenseCategories = [
-  { name: "Staff Salaries", value: 40 },
-  { name: "Maintenance", value: 20 },
-  { name: "Utilities", value: 15 },
-  { name: "Food & Beverages", value: 15 },
-  { name: "Marketing", value: 10 },
-]
+import { getTransactions } from "@/lib/actions/transaction-actions"
+import { format } from "date-fns"
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"]
 
-const recentTransactions = [
-  {
-    id: "T12345",
-    date: "2023-07-15",
-    description: "Room Booking - Luxury Double Suite",
-    type: "Income",
-    amount: "$645.00",
-  },
-  {
-    id: "T12346",
-    date: "2023-07-14",
-    description: "Staff Salary - July First Half",
-    type: "Expense",
-    amount: "$2,500.00",
-  },
-  {
-    id: "T12347",
-    date: "2023-07-14",
-    description: "Room Booking - Standard Room",
-    type: "Income",
-    amount: "$375.00",
-  },
-  {
-    id: "T12348",
-    date: "2023-07-13",
-    description: "Utility Bills - Electricity",
-    type: "Expense",
-    amount: "$850.00",
-  },
-  {
-    id: "T12349",
-    date: "2023-07-12",
-    description: "Restaurant Revenue",
-    type: "Income",
-    amount: "$1,250.00",
-  },
-]
-
-const invoices = [
-  {
-    id: "INV-2023-001",
-    date: "2023-07-15",
-    customer: "John Smith",
-    description: "Room Booking - Luxury Double Suite",
-    status: "Paid",
-    amount: "$645.00",
-  },
-  {
-    id: "INV-2023-002",
-    date: "2023-07-14",
-    customer: "Sarah Johnson",
-    description: "Room Booking - Standard Room",
-    status: "Paid",
-    amount: "$375.00",
-  },
-  {
-    id: "INV-2023-003",
-    date: "2023-07-12",
-    customer: "Michael Brown",
-    description: "Restaurant Services",
-    status: "Pending",
-    amount: "$125.00",
-  },
-  {
-    id: "INV-2023-004",
-    date: "2023-07-10",
-    customer: "Emily Davis",
-    description: "Spa Services",
-    status: "Paid",
-    amount: "$210.00",
-  },
-  {
-    id: "INV-2023-005",
-    date: "2023-07-08",
-    customer: "Robert Wilson",
-    description: "Room Booking - Executive Suite",
-    status: "Overdue",
-    amount: "$875.00",
-  },
-]
-
 export default function AccountantDashboard() {
   const [activeTab, setActiveTab] = useState("overview")
+  const [transactions, setTransactions] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [revenueData, setRevenueData] = useState([])
+  const [expenseCategories, setExpenseCategories] = useState([])
+  const [financialSummary, setFinancialSummary] = useState({
+    totalRevenue: 0,
+    totalExpenses: 0,
+    netProfit: 0,
+    pendingInvoices: 0,
+  })
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true)
+      try {
+        // Fetch transactions
+        const result = await getTransactions()
+        if (result.success) {
+          setTransactions(result.data)
+
+          // Process data for charts and summary
+          processTransactionData(result.data)
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  const processTransactionData = (transactions) => {
+    // Group transactions by month for revenue chart
+    const monthlyData = transactions.reduce((acc, transaction) => {
+      const date = new Date(transaction.date)
+      const month = format(date, "MMM")
+
+      if (!acc[month]) {
+        acc[month] = { name: month, revenue: 0, expenses: 0 }
+      }
+
+      if (transaction.type === "INCOME") {
+        acc[month].revenue += transaction.amount
+      } else {
+        acc[month].expenses += transaction.amount
+      }
+
+      return acc
+    }, {})
+
+    // Convert to array and sort by month
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    const chartData = Object.values(monthlyData).sort((a, b) => months.indexOf(a.name) - months.indexOf(b.name))
+
+    setRevenueData(chartData)
+
+    // Group expenses by category for pie chart
+    const expensesByCategory = transactions
+      .filter((t) => t.type === "EXPENSE")
+      .reduce((acc, transaction) => {
+        const category = transaction.category.replace(/_/g, " ")
+
+        if (!acc[category]) {
+          acc[category] = 0
+        }
+
+        acc[category] += transaction.amount
+
+        return acc
+      }, {})
+
+    // Convert to array for pie chart
+    const expenseCategoriesData = Object.entries(expensesByCategory).map(([name, value]) => ({
+      name,
+      value,
+    }))
+
+    setExpenseCategories(expenseCategoriesData)
+
+    // Calculate financial summary
+    const totalRevenue = transactions.filter((t) => t.type === "INCOME").reduce((sum, t) => sum + t.amount, 0)
+
+    const totalExpenses = transactions.filter((t) => t.type === "EXPENSE").reduce((sum, t) => sum + t.amount, 0)
+
+    setFinancialSummary({
+      totalRevenue,
+      totalExpenses,
+      netProfit: totalRevenue - totalExpenses,
+      pendingInvoices: 12, // This would come from a real invoice system
+    })
+  }
+
+  // Get recent transactions
+  const recentTransactions = transactions
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 5)
 
   return (
     <div className="space-y-6">
@@ -163,7 +163,7 @@ export default function AccountantDashboard() {
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">$45,231.89</div>
+                <div className="text-2xl font-bold">${financialSummary.totalRevenue.toFixed(2)}</div>
                 <p className="text-xs text-muted-foreground">
                   <span className="text-green-500 flex items-center">
                     <ArrowUpRight className="mr-1 h-4 w-4" />
@@ -179,7 +179,7 @@ export default function AccountantDashboard() {
                 <CreditCard className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">$21,456.78</div>
+                <div className="text-2xl font-bold">${financialSummary.totalExpenses.toFixed(2)}</div>
                 <p className="text-xs text-muted-foreground">
                   <span className="text-red-500 flex items-center">
                     <ArrowUpRight className="mr-1 h-4 w-4" />
@@ -195,7 +195,7 @@ export default function AccountantDashboard() {
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">$23,775.11</div>
+                <div className="text-2xl font-bold">${financialSummary.netProfit.toFixed(2)}</div>
                 <p className="text-xs text-muted-foreground">
                   <span className="text-green-500 flex items-center">
                     <ArrowUpRight className="mr-1 h-4 w-4" />
@@ -211,7 +211,7 @@ export default function AccountantDashboard() {
                 <FileText className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">12</div>
+                <div className="text-2xl font-bold">{financialSummary.pendingInvoices}</div>
                 <p className="text-xs text-muted-foreground">
                   <span className="text-red-500 flex items-center">
                     <ArrowDownRight className="mr-1 h-4 w-4" />
@@ -231,17 +231,23 @@ export default function AccountantDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={revenueData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="revenue" fill="#8884d8" name="Revenue" />
-                      <Bar dataKey="expenses" fill="#82ca9d" name="Expenses" />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  {isLoading ? (
+                    <div className="flex h-full items-center justify-center">
+                      <p>Loading chart data...</p>
+                    </div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={revenueData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip formatter={(value) => `${value.toFixed(2)}`} />
+                        <Legend />
+                        <Bar dataKey="revenue" fill="#8884d8" name="Revenue" />
+                        <Bar dataKey="expenses" fill="#82ca9d" name="Expenses" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -251,25 +257,31 @@ export default function AccountantDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={expenseCategories}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      >
-                        {expenseCategories.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
+                  {isLoading ? (
+                    <div className="flex h-full items-center justify-center">
+                      <p>Loading chart data...</p>
+                    </div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={expenseCategories}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {expenseCategories.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -281,42 +293,54 @@ export default function AccountantDashboard() {
               <CardTitle>Recent Transactions</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Transaction ID</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentTransactions.map((transaction) => (
-                    <TableRow key={transaction.id}>
-                      <TableCell className="font-medium">{transaction.id}</TableCell>
-                      <TableCell>{transaction.date}</TableCell>
-                      <TableCell>{transaction.description}</TableCell>
-                      <TableCell>
-                        <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                            transaction.type === "Income" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {transaction.type}
-                        </span>
-                      </TableCell>
-                      <TableCell>{transaction.amount}</TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="icon">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
+              {isLoading ? (
+                <div className="flex h-40 items-center justify-center">
+                  <p>Loading transactions...</p>
+                </div>
+              ) : recentTransactions.length === 0 ? (
+                <div className="flex h-40 items-center justify-center">
+                  <p className="text-muted-foreground">No transactions found</p>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Transaction ID</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {recentTransactions.map((transaction) => (
+                      <TableRow key={transaction.id}>
+                        <TableCell className="font-medium">{transaction.id.substring(0, 8)}</TableCell>
+                        <TableCell>{format(new Date(transaction.date), "MMM dd, yyyy")}</TableCell>
+                        <TableCell>{transaction.description}</TableCell>
+                        <TableCell>
+                          <span
+                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                              transaction.type === "INCOME" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                            }`}
+                          >
+                            {transaction.type}
+                          </span>
+                        </TableCell>
+                        <TableCell>${transaction.amount.toFixed(2)}</TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" asChild>
+                            <Link href={`/dashboard/accountant/transactions/${transaction.id}`}>
+                              <Eye className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
               <div className="mt-4 flex justify-end">
                 <Link href="/dashboard/accountant/transactions">
                   <Button variant="outline">View All Transactions</Button>
@@ -333,47 +357,61 @@ export default function AccountantDashboard() {
             <CardContent>
               <p className="text-muted-foreground mb-4">View and manage all financial transactions.</p>
               <div className="flex justify-end mb-4">
-                <Button>
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  New Transaction
-                </Button>
+                <Link href="/dashboard/accountant/transactions/new">
+                  <Button>
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    New Transaction
+                  </Button>
+                </Link>
               </div>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Transaction ID</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentTransactions.map((transaction) => (
-                    <TableRow key={transaction.id}>
-                      <TableCell className="font-medium">{transaction.id}</TableCell>
-                      <TableCell>{transaction.date}</TableCell>
-                      <TableCell>{transaction.description}</TableCell>
-                      <TableCell>
-                        <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                            transaction.type === "Income" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {transaction.type}
-                        </span>
-                      </TableCell>
-                      <TableCell>{transaction.amount}</TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="icon">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
+              {isLoading ? (
+                <div className="flex h-40 items-center justify-center">
+                  <p>Loading transactions...</p>
+                </div>
+              ) : transactions.length === 0 ? (
+                <div className="flex h-40 items-center justify-center">
+                  <p className="text-muted-foreground">No transactions found</p>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Transaction ID</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {transactions.map((transaction) => (
+                      <TableRow key={transaction.id}>
+                        <TableCell className="font-medium">{transaction.id.substring(0, 8)}</TableCell>
+                        <TableCell>{format(new Date(transaction.date), "MMM dd, yyyy")}</TableCell>
+                        <TableCell>{transaction.description}</TableCell>
+                        <TableCell>
+                          <span
+                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                              transaction.type === "INCOME" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                            }`}
+                          >
+                            {transaction.type}
+                          </span>
+                        </TableCell>
+                        <TableCell>${transaction.amount.toFixed(2)}</TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" asChild>
+                            <Link href={`/dashboard/accountant/transactions/${transaction.id}`}>
+                              <Eye className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -390,48 +428,9 @@ export default function AccountantDashboard() {
                   New Invoice
                 </Button>
               </div>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Invoice ID</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {invoices.map((invoice) => (
-                    <TableRow key={invoice.id}>
-                      <TableCell className="font-medium">{invoice.id}</TableCell>
-                      <TableCell>{invoice.date}</TableCell>
-                      <TableCell>{invoice.customer}</TableCell>
-                      <TableCell>{invoice.description}</TableCell>
-                      <TableCell>
-                        <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                            invoice.status === "Paid"
-                              ? "bg-green-100 text-green-800"
-                              : invoice.status === "Pending"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {invoice.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>{invoice.amount}</TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="icon">
-                          <Download className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <div className="flex h-40 items-center justify-center">
+                <p className="text-muted-foreground">Invoice management coming soon</p>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -453,10 +452,12 @@ export default function AccountantDashboard() {
                       <p className="text-sm text-muted-foreground mt-2 mb-4">
                         Comprehensive financial report for the current month
                       </p>
-                      <Button>
-                        <Download className="mr-2 h-4 w-4" />
-                        Generate Report
-                      </Button>
+                      <Link href="/dashboard/accountant/reports">
+                        <Button>
+                          <Download className="mr-2 h-4 w-4" />
+                          Generate Report
+                        </Button>
+                      </Link>
                     </div>
                   </CardContent>
                 </Card>
@@ -468,10 +469,12 @@ export default function AccountantDashboard() {
                       <p className="text-sm text-muted-foreground mt-2 mb-4">
                         Detailed financial analysis for the current quarter
                       </p>
-                      <Button>
-                        <Download className="mr-2 h-4 w-4" />
-                        Generate Report
-                      </Button>
+                      <Link href="/dashboard/accountant/reports">
+                        <Button>
+                          <Download className="mr-2 h-4 w-4" />
+                          Generate Report
+                        </Button>
+                      </Link>
                     </div>
                   </CardContent>
                 </Card>
@@ -483,10 +486,12 @@ export default function AccountantDashboard() {
                       <p className="text-sm text-muted-foreground mt-2 mb-4">
                         Complete financial overview for the current year
                       </p>
-                      <Button>
-                        <Download className="mr-2 h-4 w-4" />
-                        Generate Report
-                      </Button>
+                      <Link href="/dashboard/accountant/reports">
+                        <Button>
+                          <Download className="mr-2 h-4 w-4" />
+                          Generate Report
+                        </Button>
+                      </Link>
                     </div>
                   </CardContent>
                 </Card>

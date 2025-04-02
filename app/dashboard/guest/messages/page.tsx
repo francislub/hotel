@@ -7,7 +7,8 @@ import { Plus, Eye } from "lucide-react"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { redirect } from "next/navigation"
-import { getMessages } from "@/lib/actions/message-actions"
+import { getMessagesByUser } from "@/lib/actions/message-actions"
+import { formatDistanceToNow } from "date-fns"
 
 export default async function GuestMessagesPage() {
   const session = await getServerSession(authOptions)
@@ -17,8 +18,22 @@ export default async function GuestMessagesPage() {
   }
 
   // Fetch messages from the database
-  const messagesResult = await getMessages()
+  const messagesResult = await getMessagesByUser(session.user.id)
   const messages = messagesResult.success ? messagesResult.data : []
+
+  // Format category for display
+  const formatCategory = (category: string) => {
+    return category.replace(/_/g, " ")
+  }
+
+  // Extract subject from content
+  const extractSubject = (content: string) => {
+    if (content.startsWith("Subject:")) {
+      const subjectLine = content.split("\n")[0]
+      return subjectLine.replace("Subject:", "").trim()
+    }
+    return content.substring(0, 50) + (content.length > 50 ? "..." : "")
+  }
 
   return (
     <div className="space-y-6">
@@ -53,8 +68,8 @@ export default async function GuestMessagesPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Date</TableHead>
+                    <TableHead>Subject</TableHead>
                     <TableHead>Category</TableHead>
-                    <TableHead>Message</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -62,11 +77,11 @@ export default async function GuestMessagesPage() {
                 <TableBody>
                   {messages.map((message) => (
                     <TableRow key={message.id}>
-                      <TableCell>{message.timestamp}</TableCell>
+                      <TableCell>{formatDistanceToNow(new Date(message.timestamp), { addSuffix: true })}</TableCell>
+                      <TableCell className="max-w-xs truncate">{extractSubject(message.content)}</TableCell>
                       <TableCell>
-                        <Badge variant="outline">{message.category}</Badge>
+                        <Badge variant="outline">{formatCategory(message.category)}</Badge>
                       </TableCell>
-                      <TableCell className="max-w-xs truncate">{message.content}</TableCell>
                       <TableCell>
                         <Badge variant={message.isRead ? "default" : "success"}>
                           {message.isRead ? "Read" : "Unread"}

@@ -1,52 +1,65 @@
 "use client"
 
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "@/components/ui/use-toast"
 import { sendMessage } from "@/lib/actions/message-actions"
 
 const formSchema = z.object({
-  content: z.string().min(10, "Message must be at least 10 characters"),
-  category: z.string().min(1, "Please select a category"),
+  category: z.string({
+    required_error: "Please select a category",
+  }),
+  subject: z.string().min(2, {
+    message: "Subject must be at least 2 characters.",
+  }),
+  message: z.string().min(10, {
+    message: "Message must be at least 10 characters.",
+  }),
 })
-
-type FormValues = z.infer<typeof formSchema>
 
 interface MessageFormProps {
   userId: string
-  onSuccess?: () => void
 }
 
-export default function MessageForm({ userId, onSuccess }: MessageFormProps) {
-  const [isLoading, setIsLoading] = useState(false)
+export default function MessageForm({ userId }: MessageFormProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter()
 
-  const form = useForm<FormValues>({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      content: "",
       category: "",
+      subject: "",
+      message: "",
     },
   })
 
-  async function onSubmit(values: FormValues) {
-    setIsLoading(true)
-
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true)
     try {
-      const result = await sendMessage(userId, values.content, values.category)
+      // In a real app, you would get the admin ID from the database
+      // For now, we'll use a placeholder admin ID
+      const adminId = "admin-user-id" // Replace with actual admin ID
+
+      // Combine subject and message for content
+      const content = `Subject: ${values.subject}\n\n${values.message}`
+
+      const result = await sendMessage(userId, adminId, content, values.category)
 
       if (result.success) {
         toast({
-          title: "Message sent",
+          title: "Message Sent",
           description: "Your message has been sent successfully.",
         })
-        form.reset()
-        if (onSuccess) onSuccess()
+        router.push("/dashboard/guest/messages")
       } else {
         toast({
           title: "Error",
@@ -62,7 +75,7 @@ export default function MessageForm({ userId, onSuccess }: MessageFormProps) {
         variant: "destructive",
       })
     } finally {
-      setIsLoading(false)
+      setIsSubmitting(false)
     }
   }
 
@@ -82,36 +95,45 @@ export default function MessageForm({ userId, onSuccess }: MessageFormProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="Guest Request">Guest Request</SelectItem>
-                  <SelectItem value="Guest Inquiry">Guest Inquiry</SelectItem>
-                  <SelectItem value="Complaint">Complaint</SelectItem>
-                  <SelectItem value="Feedback">Feedback</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
+                  <SelectItem value="GENERAL_INQUIRY">General Inquiry</SelectItem>
+                  <SelectItem value="ROOM_SERVICE">Room Service</SelectItem>
+                  <SelectItem value="MAINTENANCE">Maintenance Request</SelectItem>
+                  <SelectItem value="COMPLAINT">Complaint</SelectItem>
+                  <SelectItem value="FEEDBACK">Feedback</SelectItem>
                 </SelectContent>
               </Select>
-              <FormDescription>Select the category that best describes your message</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
-          name="content"
+          name="subject"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Subject</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter the subject of your message" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="message"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Message</FormLabel>
               <FormControl>
-                <Textarea placeholder="Type your message here..." className="min-h-[150px]" {...field} />
+                <Textarea placeholder="Enter your message here" className="min-h-[150px]" {...field} />
               </FormControl>
-              <FormDescription>Provide as much detail as possible</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Sending..." : "Send Message"}
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? "Sending..." : "Send Message"}
         </Button>
       </form>
     </Form>

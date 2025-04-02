@@ -1,46 +1,164 @@
 "use server"
 
-// Define the Message type
-type Message = {
-  id: string
-  sender: string
-  senderAvatar: string
-  senderInitials: string
-  content: string
-  timestamp: string
-  isRead: boolean
-  category: string
-}
+import prisma from "@/lib/db"
+import { revalidatePath } from "next/cache"
 
 export async function getMessages() {
   try {
-    // In a real application, you would have a messages table
-    // For now, we'll create a placeholder that returns an empty array
-    // since we don't have a messages table in the schema
+    const messages = await prisma.message.findMany({
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+        recipient: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    })
 
-    // This would be the actual query if we had a messages table:
-    // const messages = await prisma.message.findMany({
-    //   orderBy: { createdAt: 'desc' }
-    // })
+    // Format messages for the UI
+    const formattedMessages = messages.map((message) => ({
+      id: message.id,
+      sender: message.sender.name || "Unknown",
+      senderEmail: message.sender.email,
+      senderAvatar: message.sender.image || "",
+      senderInitials: message.sender.name
+        ? message.sender.name
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase()
+        : "?",
+      recipient: message.recipient.name || "Unknown",
+      recipientId: message.recipientId,
+      content: message.content,
+      timestamp: message.createdAt.toISOString(),
+      isRead: message.isRead,
+      category: message.category,
+    }))
 
-    return { success: true, data: [] as Message[] }
+    return { success: true, data: formattedMessages }
   } catch (error) {
     console.error("Error fetching messages:", error)
     return { success: false, message: "Failed to fetch messages" }
   }
 }
 
+export async function getMessagesByUser(userId: string) {
+  try {
+    const messages = await prisma.message.findMany({
+      where: {
+        OR: [{ senderId: userId }, { recipientId: userId }],
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+        recipient: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    })
+
+    // Format messages for the UI
+    const formattedMessages = messages.map((message) => ({
+      id: message.id,
+      sender: message.sender.name || "Unknown",
+      senderEmail: message.sender.email,
+      senderAvatar: message.sender.image || "",
+      senderInitials: message.sender.name
+        ? message.sender.name
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase()
+        : "?",
+      recipient: message.recipient.name || "Unknown",
+      recipientId: message.recipientId,
+      content: message.content,
+      timestamp: message.createdAt.toISOString(),
+      isRead: message.isRead,
+      category: message.category,
+    }))
+
+    return { success: true, data: formattedMessages }
+  } catch (error) {
+    console.error("Error fetching user messages:", error)
+    return { success: false, message: "Failed to fetch messages" }
+  }
+}
+
 export async function getMessageById(id: string) {
   try {
-    // In a real application, you would fetch from a messages table
-    // For now, we'll return a not found response
+    const message = await prisma.message.findUnique({
+      where: { id },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+        recipient: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+    })
 
-    // This would be the actual query if we had a messages table:
-    // const message = await prisma.message.findUnique({
-    //   where: { id }
-    // })
+    if (!message) {
+      return { success: false, message: "Message not found" }
+    }
 
-    return { success: false, message: "Message not found" }
+    const formattedMessage = {
+      id: message.id,
+      sender: message.sender.name || "Unknown",
+      senderEmail: message.sender.email,
+      senderAvatar: message.sender.image || "",
+      senderInitials: message.sender.name
+        ? message.sender.name
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase()
+        : "?",
+      recipient: message.recipient.name || "Unknown",
+      recipientId: message.recipientId,
+      content: message.content,
+      timestamp: message.createdAt.toISOString(),
+      isRead: message.isRead,
+      category: message.category,
+    }
+
+    return { success: true, data: formattedMessage }
   } catch (error) {
     console.error("Error fetching message:", error)
     return { success: false, message: "Failed to fetch message" }
@@ -49,15 +167,13 @@ export async function getMessageById(id: string) {
 
 export async function markMessageAsRead(id: string) {
   try {
-    // In a real application, you would update the message
-    // For now, we'll return a success response
+    await prisma.message.update({
+      where: { id },
+      data: { isRead: true },
+    })
 
-    // This would be the actual query if we had a messages table:
-    // await prisma.message.update({
-    //   where: { id },
-    //   data: { isRead: true }
-    // })
-
+    revalidatePath("/dashboard/admin/messages")
+    revalidatePath("/dashboard/guest/messages")
     return { success: true, message: "Message marked as read" }
   } catch (error) {
     console.error("Error marking message as read:", error)
@@ -65,25 +181,147 @@ export async function markMessageAsRead(id: string) {
   }
 }
 
-export async function sendMessage(userId: string, content: string, category: string) {
+export async function sendMessage(senderId: string, recipientId: string, content: string, category: string) {
   try {
-    // In a real application, you would create a new message
-    // For now, we'll return a success response
+    const message = await prisma.message.create({
+      data: {
+        senderId,
+        recipientId,
+        content,
+        category,
+        isRead: false,
+      },
+    })
 
-    // This would be the actual query if we had a messages table:
-    // await prisma.message.create({
-    //   data: {
-    //     userId,
-    //     content,
-    //     category,
-    //     isRead: false
-    //   }
-    // })
-
-    return { success: true, message: "Message sent successfully" }
+    revalidatePath("/dashboard/admin/messages")
+    revalidatePath("/dashboard/guest/messages")
+    return { success: true, data: message }
   } catch (error) {
     console.error("Error sending message:", error)
     return { success: false, message: "Failed to send message" }
+  }
+}
+
+export async function replyToMessage(messageId: string, senderId: string, content: string) {
+  try {
+    // Get the original message to determine the recipient
+    const originalMessage = await prisma.message.findUnique({
+      where: { id: messageId },
+    })
+
+    if (!originalMessage) {
+      return { success: false, message: "Original message not found" }
+    }
+
+    // Create a reply (the recipient is the sender of the original message)
+    const reply = await prisma.message.create({
+      data: {
+        senderId,
+        recipientId: originalMessage.senderId,
+        content,
+        category: originalMessage.category,
+        isRead: false,
+        parentMessageId: messageId,
+      },
+    })
+
+    // Mark the original message as read
+    await prisma.message.update({
+      where: { id: messageId },
+      data: { isRead: true },
+    })
+
+    revalidatePath("/dashboard/admin/messages")
+    revalidatePath("/dashboard/guest/messages")
+    return { success: true, data: reply }
+  } catch (error) {
+    console.error("Error replying to message:", error)
+    return { success: false, message: "Failed to reply to message" }
+  }
+}
+
+export async function getMessageThread(messageId: string) {
+  try {
+    // Get the original message
+    const originalMessage = await prisma.message.findUnique({
+      where: { id: messageId },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+        recipient: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+    })
+
+    if (!originalMessage) {
+      return { success: false, message: "Message not found" }
+    }
+
+    // Get all related messages (replies)
+    const relatedMessages = await prisma.message.findMany({
+      where: {
+        OR: [{ id: messageId }, { parentMessageId: messageId }],
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+        recipient: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "asc" },
+    })
+
+    // Format messages for the UI
+    const formattedMessages = relatedMessages.map((message) => ({
+      id: message.id,
+      sender: message.sender.name || "Unknown",
+      senderId: message.senderId,
+      senderEmail: message.sender.email,
+      senderAvatar: message.sender.image || "",
+      senderInitials: message.sender.name
+        ? message.sender.name
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase()
+        : "?",
+      recipient: message.recipient.name || "Unknown",
+      recipientId: message.recipientId,
+      content: message.content,
+      timestamp: message.createdAt.toISOString(),
+      isRead: message.isRead,
+      category: message.category,
+      isParent: message.id === messageId,
+    }))
+
+    return { success: true, data: formattedMessages }
+  } catch (error) {
+    console.error("Error fetching message thread:", error)
+    return { success: false, message: "Failed to fetch message thread" }
   }
 }
 

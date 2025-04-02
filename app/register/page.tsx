@@ -95,7 +95,7 @@ export default function RegisterPage() {
                   <SelectItem value={Role.GUEST}>Guest</SelectItem>
                   <SelectItem value={Role.ADMIN}>Admin/Manager</SelectItem>
                   <SelectItem value={Role.ACCOUNTANT}>Accountant</SelectItem>
-                  <SelectItem value={Role.STAFF}>Staff</SelectItem>
+                  {/* <SelectItem value={Role.STAFF}>Staff</SelectItem> */}
                 </SelectContent>
               </Select>
               {userType === Role.ADMIN && (
