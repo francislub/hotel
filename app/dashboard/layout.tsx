@@ -4,9 +4,8 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { useSession } from "next-auth/react"
-import { redirect } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
+import { useSession, signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -33,21 +32,33 @@ import {
   FileText,
   DollarSign,
   BarChart,
+  Utensils,
+  HelpCircle,
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { toast } from "@/components/ui/use-toast"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
   const { data: session, status } = useSession()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   // Redirect if not authenticated
   useEffect(() => {
     if (status === "unauthenticated") {
-      redirect("/login")
+      router.push("/login")
     }
-  }, [status])
+  }, [status, router])
+
+  const handleLogout = async () => {
+    await signOut({ redirect: false })
+    toast({
+      title: "Logged Out",
+      description: "You have been successfully logged out.",
+    })
+    router.push("/")
+  }
 
   if (status === "loading") {
     return <div className="flex h-screen items-center justify-center">Loading...</div>
@@ -67,7 +78,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           { name: "Dashboard", href: "/dashboard/admin", icon: Home },
           { name: "Bookings", href: "/dashboard/admin/bookings", icon: Calendar },
           { name: "Rooms", href: "/dashboard/admin/rooms", icon: Hotel },
-          { name: "Services", href: "/dashboard/admin/services", icon: CreditCard },
+          { name: "Guests", href: "/dashboard/admin/guests", icon: Users },
+          { name: "Services", href: "/dashboard/admin/services", icon: Utensils },
           { name: "Staff", href: "/dashboard/admin/staff", icon: Users },
           { name: "Messages", href: "/dashboard/admin/messages", icon: MessageSquare },
           { name: "Activities", href: "/dashboard/admin/activities", icon: Activity },
@@ -80,10 +92,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           { name: "Dashboard", href: "/dashboard/guest", icon: Home },
           { name: "Book a Room", href: "/dashboard/guest/book", icon: Hotel },
           { name: "My Bookings", href: "/dashboard/guest/bookings", icon: Calendar },
+          { name: "Services", href: "/dashboard/guest/services", icon: Utensils },
+          { name: "Dining", href: "/dashboard/guest/dining", icon: Utensils },
+          { name: "Spa & Wellness", href: "/dashboard/guest/spa", icon: Utensils },
           { name: "Activities", href: "/dashboard/guest/activities", icon: Activity },
           { name: "Messages", href: "/dashboard/guest/messages", icon: MessageSquare },
+          { name: "Support", href: "/dashboard/guest/support", icon: HelpCircle },
           { name: "Profile", href: "/dashboard/guest/profile", icon: User },
-          { name: "Preferences", href: "/dashboard/guest/preferences", icon: Settings },
         ]
       case "ACCOUNTANT":
         return [
@@ -148,7 +163,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Button variant="ghost" size="icon">
               <Bell className="h-5 w-5" />
             </Button>
-            <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -179,11 +193,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/api/auth/signout">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </Link>
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -193,10 +205,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Main Content */}
       <div className="flex flex-1">
-        {/* Sidebar - Desktop */}
-        <div className="hidden border-r bg-muted/40 lg:block lg:w-64">
-          <div className="flex h-full max-h-screen flex-col gap-2">
-            <div className="flex-1 overflow-auto py-2">
+        {/* Sidebar - Desktop - Now fixed */}
+        <div className="hidden lg:block lg:w-64 fixed top-16 bottom-0 left-0 overflow-y-auto border-r bg-muted/40">
+          <div className="flex h-full flex-col gap-2">
+            <div className="flex-1 py-2">
               <nav className="grid items-start px-2 text-sm font-medium">
                 {navigationItems.map((item) => (
                   <Link
@@ -217,8 +229,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </div>
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-auto p-4 md:p-6">{children}</main>
+        {/* Main Content - Adjusted for fixed sidebar */}
+        <main className="flex-1 overflow-auto p-4 md:p-6 lg:ml-64">{children}</main>
       </div>
     </div>
   )
