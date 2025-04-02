@@ -35,7 +35,7 @@ export default function AboutPage() {
           </div>
           <div className="relative h-[400px] rounded-xl overflow-hidden">
             <Image
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1.PNG-syKTtGxXGeRqnFHTlf9n6mGG0Ldb7F.png"
+              src="/images/offer_2.jpg"
               alt="Crown Hotel Exterior"
               fill
               className="object-cover"
@@ -112,7 +112,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             <div className="text-center">
               <div className="relative h-64 w-64 mx-auto rounded-full overflow-hidden mb-4">
-                <Image src="/placeholder.svg?height=256&width=256" alt="CEO" fill className="object-cover" />
+                <Image src="/images/author_1.jpg?height=256&width=256" alt="CEO" fill className="object-cover" />
               </div>
               <h3 className="text-xl font-bold">John Smith</h3>
               <p className="text-primary">Chief Executive Officer</p>
@@ -122,7 +122,7 @@ export default function AboutPage() {
             </div>
             <div className="text-center">
               <div className="relative h-64 w-64 mx-auto rounded-full overflow-hidden mb-4">
-                <Image src="/placeholder.svg?height=256&width=256" alt="COO" fill className="object-cover" />
+                <Image src="/images/jerran.png?height=256&width=256" alt="COO" fill className="object-cover" />
               </div>
               <h3 className="text-xl font-bold">Sarah Johnson</h3>
               <p className="text-primary">Chief Operations Officer</p>
@@ -132,7 +132,7 @@ export default function AboutPage() {
             </div>
             <div className="text-center">
               <div className="relative h-64 w-64 mx-auto rounded-full overflow-hidden mb-4">
-                <Image src="/placeholder.svg?height=256&width=256" alt="Executive Chef" fill className="object-cover" />
+                <Image src="/images/mickie.png?height=256&width=256" alt="Executive Chef" fill className="object-cover" />
               </div>
               <h3 className="text-xl font-bold">Michael Chen</h3>
               <p className="text-primary">Executive Chef</p>

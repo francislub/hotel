@@ -1,5 +1,5 @@
 import Image from "next/image"
-import Link from "next/link"
+// import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Check } from "lucide-react"
@@ -118,9 +118,9 @@ export default function RoomsPage() {
                   <span className="text-sm text-muted-foreground">
                     {room.remaining} {room.remaining === 1 ? "room" : "rooms"} left
                   </span>
-                  <Link href={`/rooms/${room.id}`}>
+                  {/* <Link href={`/rooms/${room.id}`}>
                     <Button>View Details</Button>
-                  </Link>
+                  </Link> */}
                 </div>
               </CardContent>
             </Card>
