@@ -10,7 +10,7 @@ const rooms = [
     name: "Luxury Single Room",
     description:
       "Our rooms have everything, that's for sure. Exquisitely furnished in an elegant, cosmopolitan, modern style, superior and deluxe guest rooms.",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/5.PNG-iW2Fe3pqhjNVb3mj0q296sVczqQXDD.png",
+    image: "/images/home.jpg",
     price: 89,
     features: ["Breakfast Included", "Free Wi-Fi", "Access to Gym"],
     capacity: 1,
@@ -21,7 +21,7 @@ const rooms = [
     name: "Luxury Double Suite",
     description:
       "Immerse yourself in a world where elegance meets comfort, and every detail is designed to exceed your expectations. Our Double Suite luxury is unparalleled.",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4.PNG-RIBwd59ACpqlHZMJZpGsZBEAIjlKGt.png",
+    image: "/images/room_1.jpg",
     price: 129,
     features: ["Breakfast Included", "Free Wi-Fi", "Access to Executive Lounge"],
     capacity: 2,
@@ -32,7 +32,7 @@ const rooms = [
     name: "Wing A Luxury Room",
     description:
       "Without TV | for groups - minimum of 5 pax | Premium amenities and exceptional comfort for your group stay.",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/r1.PNG-630ZQVMvKNzrzAaDvbN6ZMnxU24uCh.png",
+    image: "/images/room_2.jpg",
     price: 125,
     features: ["For Groups (up to 5)", "Free Wi-Fi", "Premium Amenities"],
     capacity: 5,
@@ -42,7 +42,7 @@ const rooms = [
     id: "wing-a-standard",
     name: "Wing A Standard Room",
     description: "Without TV | Comfortable accommodations with all the essential amenities for a pleasant stay.",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/r2.PNG-diOnHbbtJ384I445SO3OMLhctqYcCE.png",
+    image: "/images/room_3.jpg",
     price: 75,
     features: ["Free Wi-Fi", "Daily Housekeeping", "Air Conditioning"],
     capacity: 2,
@@ -52,7 +52,7 @@ const rooms = [
     id: "wing-a-travelers",
     name: "Wing A Travelers Time",
     description: "Without TV | Perfect for the busy traveler who needs a comfortable place to rest between adventures.",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/r2.PNG-diOnHbbtJ384I445SO3OMLhctqYcCE.png",
+    image: "/images/room_4.jpg",
     price: 65,
     features: ["Free Wi-Fi", "Work Desk", "Express Check-out"],
     capacity: 1,
@@ -63,7 +63,7 @@ const rooms = [
     name: "Wing B Standard Room",
     description:
       "With TV | Our Wing B rooms offer additional amenities including a flat-screen TV for your entertainment.",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/r2.PNG-diOnHbbtJ384I445SO3OMLhctqYcCE.png",
+    image: "/images/room_1.jpg",
     price: 85,
     features: ["TV Included", "Free Wi-Fi", "Mini Refrigerator"],
     capacity: 2,
