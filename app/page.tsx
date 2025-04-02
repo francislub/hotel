@@ -23,7 +23,7 @@ export default function Home() {
             Experience Luxury & Comfort
           </h1>
           <p className="mt-6 max-w-lg text-xl text-white">
-            Welcome to Crown Hotel, where exceptional service meets luxurious accommodations.
+            Welcome to Crown Hotel, where exceptional service meets luxurious accommodations
           </p>
           <div className="mt-10 flex gap-x-6">
             <Link href="/rooms">
