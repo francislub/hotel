@@ -114,12 +114,12 @@ export default async function BookingsPage() {
                                 View Details
                               </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
+                            {/* <DropdownMenuItem asChild>
                               <Link href={`/dashboard/admin/bookings/${booking.id}/edit`}>
                                 <PencilIcon className="mr-2 h-4 w-4" />
                                 Edit
                               </Link>
-                            </DropdownMenuItem>
+                            </DropdownMenuItem> */}
                             {booking.status === "PENDING" && (
                               <DropdownMenuItem asChild>
                                 <Link href={`/dashboard/admin/bookings/${booking.id}/confirm`}>
