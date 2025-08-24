@@ -85,7 +85,7 @@ export default async function AdminDashboard() {
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
+            <div className="text-2xl font-bold">ssp{totalRevenue.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
               <span className="text-green-500 flex items-center">
                 <ArrowUpRight className="mr-1 h-4 w-4" />
@@ -197,7 +197,7 @@ export default async function AdminDashboard() {
                         {booking.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>${booking.totalPrice.toFixed(2)}</TableCell>
+                    <TableCell>ssp{booking.totalPrice.toFixed(2)}</TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon" asChild>
                         <Link href={`/dashboard/admin/bookings/${booking.id}`}>

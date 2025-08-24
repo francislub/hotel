@@ -55,7 +55,7 @@ export default async function ReportsPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
+            <div className="text-2xl font-bold">ssp{totalRevenue.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">Lifetime revenue</p>
           </CardContent>
         </Card>
@@ -65,7 +65,7 @@ export default async function ReportsPage() {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${monthlyRevenue.toFixed(2)}</div>
+            <div className="text-2xl font-bold">ssp{monthlyRevenue.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">Current month</p>
           </CardContent>
         </Card>

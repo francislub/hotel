@@ -68,7 +68,7 @@ export default async function ServicesPage() {
                       <TableCell>
                         <Badge variant="outline">{service.category.replace("_", " ")}</Badge>
                       </TableCell>
-                      <TableCell>${service.price.toFixed(2)}</TableCell>
+                      <TableCell>ssp{service.price.toFixed(2)}</TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>

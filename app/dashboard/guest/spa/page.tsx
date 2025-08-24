@@ -92,7 +92,7 @@ export default function SpaWellnessPage() {
                 <CardHeader>
                   <CardTitle>{service.name}</CardTitle>
                   <CardDescription className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" /> {service.duration} | ${service.price}
+                    <Clock className="h-3 w-3" /> {service.duration} | ssp{service.price}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

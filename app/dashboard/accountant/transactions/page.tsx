@@ -75,7 +75,7 @@ export default async function TransactionsPage() {
                           {transaction.type}
                         </Badge>
                       </TableCell>
-                      <TableCell>${transaction.amount.toFixed(2)}</TableCell>
+                      <TableCell>ssp{transaction.amount.toFixed(2)}</TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>

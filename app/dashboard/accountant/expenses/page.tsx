@@ -202,7 +202,7 @@ export default function ExpensesPage() {
       <Card>
         <CardHeader>
           <CardTitle>All Expenses</CardTitle>
-          <CardDescription>Manage and track all expenses. Total: ${totalExpenses.toFixed(2)}</CardDescription>
+          <CardDescription>Manage and track all expenses. Total: ssp{totalExpenses.toFixed(2)}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-4 mb-6">
@@ -268,7 +268,7 @@ export default function ExpensesPage() {
                     <TableCell>
                       <Badge variant="outline">{expense.category}</Badge>
                     </TableCell>
-                    <TableCell>${expense.amount.toFixed(2)}</TableCell>
+                    <TableCell>ssp{expense.amount.toFixed(2)}</TableCell>
                     <TableCell>{expense.paymentMethod}</TableCell>
                     <TableCell>
                       <Badge variant={expense.status === "Paid" ? "success" : "warning"}>{expense.status}</Badge>

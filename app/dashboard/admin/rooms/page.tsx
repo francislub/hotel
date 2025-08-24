@@ -69,7 +69,7 @@ export default async function RoomsPage() {
                       <TableCell>
                         {room.capacity} {room.capacity === 1 ? "Person" : "People"}
                       </TableCell>
-                      <TableCell>${room.price.toFixed(2)}</TableCell>
+                      <TableCell>ssp{room.price.toFixed(2)}</TableCell>
                       <TableCell>
                         <Badge
                           variant={

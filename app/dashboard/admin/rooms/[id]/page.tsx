@@ -71,7 +71,7 @@ export default async function RoomDetailsPage({ params }: RoomDetailsPageProps) 
             </div>
             <div>
               <h3 className="text-sm font-medium text-muted-foreground">Price per Night</h3>
-              <p>${room.price.toFixed(2)}</p>
+              <p>ssp{room.price.toFixed(2)}</p>
             </div>
             <div>
               <h3 className="text-sm font-medium text-muted-foreground">Capacity</h3>

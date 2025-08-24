@@ -167,7 +167,7 @@ export default async function GuestDashboard() {
                         </TableCell>
                         <TableCell>{format(new Date(booking.checkIn), "MMM dd, yyyy")}</TableCell>
                         <TableCell>{format(new Date(booking.checkOut), "MMM dd, yyyy")}</TableCell>
-                        <TableCell>${booking.totalPrice.toFixed(2)}</TableCell>
+                        <TableCell>ssp{booking.totalPrice.toFixed(2)}</TableCell>
                         <TableCell className="text-right">
                           <Button variant="ghost" size="icon" asChild>
                             <Link href={`/dashboard/guest/bookings/${booking.id}`}>
@@ -262,7 +262,7 @@ export default async function GuestDashboard() {
                             </TableCell>
                             <TableCell>{format(new Date(booking.checkIn), "MMM dd, yyyy")}</TableCell>
                             <TableCell>{format(new Date(booking.checkOut), "MMM dd, yyyy")}</TableCell>
-                            <TableCell>${booking.totalPrice.toFixed(2)}</TableCell>
+                            <TableCell>ssp{booking.totalPrice.toFixed(2)}</TableCell>
                             <TableCell className="text-right">
                               <Button variant="ghost" size="icon" asChild>
                                 <Link href={`/dashboard/guest/bookings/${booking.id}`}>
@@ -304,7 +304,7 @@ export default async function GuestDashboard() {
                               </TableCell>
                               <TableCell>{format(new Date(booking.checkIn), "MMM dd, yyyy")}</TableCell>
                               <TableCell>{format(new Date(booking.checkOut), "MMM dd, yyyy")}</TableCell>
-                              <TableCell>${booking.totalPrice.toFixed(2)}</TableCell>
+                              <TableCell>ssp{booking.totalPrice.toFixed(2)}</TableCell>
                               <TableCell className="text-right">
                                 <Button variant="ghost" size="icon" asChild>
                                   <Link href={`/dashboard/guest/bookings/${booking.id}`}>

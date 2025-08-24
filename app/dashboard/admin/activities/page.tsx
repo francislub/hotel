@@ -75,7 +75,7 @@ export default async function ActivitiesPage() {
                       <TableCell>
                         {activity.remaining} / {activity.capacity}
                       </TableCell>
-                      <TableCell>${activity.price.toFixed(2)}</TableCell>
+                      <TableCell>ssp{activity.price.toFixed(2)}</TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>

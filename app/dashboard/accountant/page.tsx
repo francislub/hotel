@@ -163,7 +163,7 @@ export default function AccountantDashboard() {
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${financialSummary.totalRevenue.toFixed(2)}</div>
+                <div className="text-2xl font-bold">ssp{financialSummary.totalRevenue.toFixed(2)}</div>
                 <p className="text-xs text-muted-foreground">
                   <span className="text-green-500 flex items-center">
                     <ArrowUpRight className="mr-1 h-4 w-4" />
@@ -179,7 +179,7 @@ export default function AccountantDashboard() {
                 <CreditCard className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${financialSummary.totalExpenses.toFixed(2)}</div>
+                <div className="text-2xl font-bold">ssp{financialSummary.totalExpenses.toFixed(2)}</div>
                 <p className="text-xs text-muted-foreground">
                   <span className="text-red-500 flex items-center">
                     <ArrowUpRight className="mr-1 h-4 w-4" />
@@ -195,7 +195,7 @@ export default function AccountantDashboard() {
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${financialSummary.netProfit.toFixed(2)}</div>
+                <div className="text-2xl font-bold">ssp{financialSummary.netProfit.toFixed(2)}</div>
                 <p className="text-xs text-muted-foreground">
                   <span className="text-green-500 flex items-center">
                     <ArrowUpRight className="mr-1 h-4 w-4" />
@@ -328,7 +328,7 @@ export default function AccountantDashboard() {
                             {transaction.type}
                           </span>
                         </TableCell>
-                        <TableCell>${transaction.amount.toFixed(2)}</TableCell>
+                        <TableCell>ssp{transaction.amount.toFixed(2)}</TableCell>
                         <TableCell className="text-right">
                           <Button variant="ghost" size="icon" asChild>
                             <Link href={`/dashboard/accountant/transactions/${transaction.id}`}>
@@ -399,7 +399,7 @@ export default function AccountantDashboard() {
                             {transaction.type}
                           </span>
                         </TableCell>
-                        <TableCell>${transaction.amount.toFixed(2)}</TableCell>
+                        <TableCell>ssp{transaction.amount.toFixed(2)}</TableCell>
                         <TableCell className="text-right">
                           <Button variant="ghost" size="icon" asChild>
                             <Link href={`/dashboard/accountant/transactions/${transaction.id}`}>

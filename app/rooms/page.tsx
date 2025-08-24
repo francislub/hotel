@@ -101,7 +101,7 @@ export default function RoomsPage() {
                     </p>
                   </div>
                   <div className="text-xl font-bold text-primary">
-                    ${room.price}
+                  ssp{room.price}
                     <span className="text-sm font-normal text-muted-foreground">/night</span>
                   </div>
                 </div>

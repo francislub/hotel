@@ -96,7 +96,7 @@ export default async function BookingsPage() {
                       <TableCell>
                         <Badge variant={getStatusBadgeVariant(booking.status)}>{booking.status}</Badge>
                       </TableCell>
-                      <TableCell>${booking.totalPrice.toFixed(2)}</TableCell>
+                      <TableCell>ssp{booking.totalPrice.toFixed(2)}</TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>

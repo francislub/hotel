@@ -324,18 +324,18 @@ export default function ReportsPage() {
               <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                 <div className="space-y-2">
                   <div className="text-sm font-medium text-muted-foreground">Total Income</div>
-                  <div className="text-3xl font-bold text-green-600">${reportData.totalIncome.toFixed(2)}</div>
+                  <div className="text-3xl font-bold text-green-600">ssp{reportData.totalIncome.toFixed(2)}</div>
                 </div>
                 <div className="space-y-2">
                   <div className="text-sm font-medium text-muted-foreground">Total Expenses</div>
-                  <div className="text-3xl font-bold text-red-600">${reportData.totalExpenses.toFixed(2)}</div>
+                  <div className="text-3xl font-bold text-red-600">ssp{reportData.totalExpenses.toFixed(2)}</div>
                 </div>
                 <div className="space-y-2">
                   <div className="text-sm font-medium text-muted-foreground">Net Profit</div>
                   <div
                     className={`text-3xl font-bold ${reportData.netProfit >= 0 ? "text-green-600" : "text-red-600"}`}
                   >
-                    ${reportData.netProfit.toFixed(2)}
+                    ssp{reportData.netProfit.toFixed(2)}
                   </div>
                 </div>
               </div>

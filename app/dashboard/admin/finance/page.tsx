@@ -60,7 +60,7 @@ export default async function FinancePage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalIncome.toFixed(2)}</div>
+            <div className="text-2xl font-bold">ssp{totalIncome.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
               <span className="text-green-500 flex items-center">
                 <TrendingUp className="mr-1 h-4 w-4" />
@@ -76,7 +76,7 @@ export default async function FinancePage() {
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalExpenses.toFixed(2)}</div>
+            <div className="text-2xl font-bold">ssp{totalExpenses.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
               <span className="text-red-500 flex items-center">
                 <TrendingDown className="mr-1 h-4 w-4" />
@@ -92,7 +92,7 @@ export default async function FinancePage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${netProfit.toFixed(2)}</div>
+            <div className="text-2xl font-bold">ssp{netProfit.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
               <span className="text-green-500 flex items-center">
                 <TrendingUp className="mr-1 h-4 w-4" />
@@ -108,7 +108,7 @@ export default async function FinancePage() {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$50,000.00</div>
+            <div className="text-2xl font-bold">ssp50,000.00</div>
             <p className="text-xs text-muted-foreground">
               <span className="text-green-500">65%</span> of budget used
             </p>
@@ -160,7 +160,7 @@ export default async function FinancePage() {
                           {transaction.type}
                         </Badge>
                       </TableCell>
-                      <TableCell>${transaction.amount.toFixed(2)}</TableCell>
+                      <TableCell>ssp{transaction.amount.toFixed(2)}</TableCell>
                       <TableCell>
                         <Badge variant="outline">Completed</Badge>
                       </TableCell>
