@@ -71,7 +71,7 @@ export default function Home() {
             </div>
             <div className="relative">
               <Image
-                src="/images/discover_3.jpg"
+                src="/images/one/seven.jpg"
                 alt="Crown Hotel Exterior"
                 width={600}
                 height={400}
