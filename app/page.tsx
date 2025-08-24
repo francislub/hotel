@@ -269,7 +269,7 @@ export default function Home() {
             <div className="text-center">
               <div className="relative h-64 mb-6 overflow-hidden rounded-lg">
                 <Image
-                  src="/images/discover_3.jpg"
+                  src="/images/one/in.jpg"
                   alt="Indoor Pool"
                   fill
                   className="object-cover"
@@ -286,7 +286,7 @@ export default function Home() {
             <div className="text-center">
               <div className="relative h-64 mb-6 overflow-hidden rounded-lg">
                 <Image
-                  src="/images/discover_3.jpg"
+                  src="/images/one/pp.jpg"
                   alt="Spa Zone"
                   fill
                   className="object-cover"
