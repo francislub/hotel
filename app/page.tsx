@@ -96,7 +96,7 @@ export default function Home() {
             <Card className="overflow-hidden">
               <div className="relative h-64">
                 <Image
-                  src="/images/discover_3.jpg"
+                  src="/images/one/one.jpg"
                   alt="Luxury Single Room"
                   fill
                   className="object-cover"
@@ -142,7 +142,7 @@ export default function Home() {
             <Card className="overflow-hidden">
               <div className="relative h-64">
                 <Image
-                  src="/images/discover_3.jpg"
+                  src="/images/one/three.jpg"
                   alt="Luxury Double Suite"
                   fill
                   className="object-cover"
@@ -188,7 +188,7 @@ export default function Home() {
             <Card className="overflow-hidden">
               <div className="relative h-64">
                 <Image
-                  src="/images/discover_3.jpg"
+                  src="/images/one/five.jpg"
                   alt="Wing A Luxury Room"
                   fill
                   className="object-cover"
