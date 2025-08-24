@@ -113,7 +113,7 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="text-xl font-bold text-primary">
-                    $89<span className="text-sm font-normal text-muted-foreground">/night</span>
+                  ssp89<span className="text-sm font-normal text-muted-foreground">/night</span>
                   </div>
                 </div>
                 <div className="mt-4 space-y-2">
@@ -159,7 +159,7 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="text-xl font-bold text-primary">
-                    $129<span className="text-sm font-normal text-muted-foreground">/night</span>
+                  ssp129<span className="text-sm font-normal text-muted-foreground">/night</span>
                   </div>
                 </div>
                 <div className="mt-4 space-y-2">
@@ -205,7 +205,7 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="text-xl font-bold text-primary">
-                    $125<span className="text-sm font-normal text-muted-foreground">/night</span>
+                  ssp125<span className="text-sm font-normal text-muted-foreground">/night</span>
                   </div>
                 </div>
                 <div className="mt-4 space-y-2">
