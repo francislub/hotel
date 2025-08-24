@@ -11,7 +11,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative h-[600px] md:h-[700px] overflow-hidden">
         <Image
-          src="/images/offer_1.jpg"
+          src="/images/one/six.jpg"
           alt="Crown Hotel Luxury Room"
           fill
           className="object-cover"
